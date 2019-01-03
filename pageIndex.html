@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<title>分页插件</title>
+<style>
+*{ margin:0; padding:0; list-style:none;}
+a{ text-decoration:none;}
+a:hover{ text-decoration:none;}
+.tcdPageCode{padding: 15px 20px;text-align: left;color: #ccc;}
+.tcdPageCode a{display: inline-block;color: #428bca;display: inline-block;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode a:hover{text-decoration: none;border: 1px solid #428bca;}
+.tcdPageCode span.current{display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #428bca;	border: 1px solid #428bca;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode span.disabled{	display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #bfbfbf;background: #f2f2f2;border: 1px solid #bfbfbf;border-radius: 4px;vertical-align: middle;}
+</style>
+</head>
+<body>
+<!-- 代码部分begin -->
+    <div class="tcdPageCode">
+    </div>
+    <table id="datas" style="margin-top:10px"border="1">
+                        <colgroup>
+                            <col width="100">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                        </colgroup>
+                        <thead>
+                            <tr style="color: #4B4949; height: 50px; background-color: #F4F2F2">
+                                <th>序号</th>
+                                <th>点位编号</th>
+                                <th>点位名称</th>
+                                <th>添加时间</th>
+                                <th>设备状态</th>
+                                <th>相关操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="template">
+                           
+                        </tbody>
+                    </table>
+</body>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery.page1.js" type="text/javascript"></script>
+<script type="text/javascript">
+ $(document).ready(function () {
+ 
+       $.ajax({
+                        //要用post方式    
+                        type: "Post",
+                        //方法所在页面和方法名   
+                        url: "../ashx/getSplitPageData.ashx",
+                        cache: false,
+                        async: false,
+                        //index 1表示请求的是取得整个数据  pageindex表示的是当前是哪一页
+                        data: {"index":1, "pageIndex": $('.current').text()},
+                        datatype: 'json',
+                        success: function (data) {
+                           $("#template").empty();
+                           //alert(data);
+                           data=jQuery.parseJSON(data);
+                           for(i=0;i<data.length;i++){
+                                if (data[i].id % 2 == 0) {
+                                    var row = " <tr style='color: #565454;background-color: #F4F2F2;'><td id='id'>" +data[i].id +
+                                           "</td><td id='url'>" +data[i].url +
+                                           "</td><td id='urlname'>" +data[i].urlname +
+                                           "</td><td id='date'>" +data[i].date +
+                                           "</td><td id='pid'>" + data[i].pid +
+                                           "</td><td id='operation'>" +data[i].operation +
+                                           "</td></tr>";
+                                    $("#template").append(row);
+                                } else {
+                                    var row = " <tr style='color: #565454;'><td id='id'>" + data[i].id +
+                                          "</td><td id='url'>" + data[i].url +
+                                          "</td><td id='urlname'>" + data[i].urlname +
+                                          "</td><td id='date'>" + data[i].date +
+                                          "</td><td id='pid'>" + data[i].pid +
+                                          "</td><td id='operation'>" + data[i].operation +
+                                          "</td></tr>";
+                                    $("#template").append(row);
+                                }
+                            };
+                        },
+           
+                    });
+ 
+ 
+ });
+         $.ajax({
+            //要用post方式    
+            type: "Post",
+            //方法所在页面和方法名   
+            url: "../ashx/getSplitPageData.ashx",
+            cache: false,
+            async: false,
+            //index 0表示请求的是总行数  pageindex表示的是当前是哪一页
+            data: {"index":0},
+            dataType: 'text',
+            success: function (data) {
+                num=data;
+                alert(data);
+                pageNum=parseInt(num/3)+1;
+                $(".tcdPageCode").createPage({
+                    totalNum:data,//总条数
+                    pageCount:pageNum ,
+                    current:1,
+                    backFn:function(p){
+                        console.log(p);
+                    }
+                });
+            },
+           
+        });
+   
+</script>
+
+<!-- 代码部分end -->
+</html>
